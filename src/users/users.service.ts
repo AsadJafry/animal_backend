@@ -1,48 +1,83 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Entity, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { addDetailsDto } from './dto/addUserDetails.dto';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
-  ){}
-  async create(createUserDto: CreateUserDto):Promise<User> {
-    const {email,name}=createUserDto;
-    const user=new User();
-    user.email=email;
-    user.name=name;
-    await user.save()
-    return user
+    private userRepository: Repository<User>,
+  ) {}
+  private async hashPass(salt:string,password:string):Promise<string>{
+    return await bcrypt.hash(password,salt) 
+  }
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const { email, password, mobile } = createUserDto;
+
+    const user = new User();
+    user.email = email;
+    user.salt=await bcrypt.genSalt()
+    console.log('salt ',user.salt)
+    user.password = await this.hashPass(user.salt,password);
+    user.mobile = mobile;
+    user.createdOnDate=new Date()
+    try{
+    await this.userRepository.save(user);
+    }catch (error){
+      console.log(error)
+      if (error.code==='23505'){
+        throw new ConflictException( "user already exists with this email");
+      }
+      else throw new NotFoundException
+    }
+    return user;
+  }
+  async adduserDetails(userID, addDetailsDto: addDetailsDto) {
+    const { name, userType,userRole } = addDetailsDto;
+    const user = await await this.getById(userID);
+    if (!user) {
+      throw new NotFoundException('usernot found');
+    }
+  
+    user.name = name;
+    if (userType){
+    user.userType = userType;}
+    if (userRole){
+      user.userRole=userRole
+    }
+
+    user.updatedOnDate=new Date()
+    await this.userRepository.save(user);
+    return user;
   }
 
   async findAll() {
-   return await this.userRepository.find()
+    return await this.userRepository.find();
   }
 
-  async findOne(id):Promise<User> {
-    const found= await this.userRepository.findOneBy(id)
-    if (!found){
-      throw new NotFoundException('')
+  async getById(userId): Promise<User> {
+    console.log(userId);
+    const found = await this.userRepository.findOneBy({userId});
+    if (!found) {
+      throw new NotFoundException('');
     }
-    return found 
+    return found;
   }
 
-  
-
-  async update(id: number, name:string) {
-    const user=await this.findOne(id);
-    user.name=name
-    await user.save()
+  async update(id: number, name: string) {
+    const user = await this.getById(id);
+    user.name = name;
+    await user.save();
     return `This action updates a #${id} user`;
   }
 
   async remove(id: number) {
-    return await this.userRepository.delete(id)
-    
+    return await this.userRepository.delete(id);
   }
+
+  
 }
