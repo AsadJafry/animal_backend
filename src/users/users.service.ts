@@ -70,7 +70,13 @@ export class UsersService {
     await this.userRepository.save(user);
     return user;
   }
-
+  async validatePass(userID,password:string){
+    const user=await this.getById(userID);
+    if (await this.hashPass(user.salt,password)===user.password){
+        return "welcome"
+    }
+    else return 'incorrect password'
+  }
   async findAll() {
     return await this.userRepository.find();
   }

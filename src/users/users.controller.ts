@@ -21,6 +21,12 @@ import { UserRoleValidPipe } from './pipes/userRoleValidation.pipe';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Post(':id/signin')
+  userSignIn(@Param('id') userId,@Body('password') password:string){
+    return this.usersService.validatePass(userId,password)
+  }
+
+
   @Post()
   @UsePipes(ValidationPipe)
   createUser(@Body(MobileValidationPipe) createUserDto: CreateUserDto
