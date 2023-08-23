@@ -16,24 +16,33 @@ export class addDetailsDto {
   @IsEnum(UserRole)
   userRole: UserRole;
 
-  //@IsNotEmpty()
+  @IsOptional()
   @IsEnum(PackageType)
   packageType: PackageType;
 
+  @IsOptional()
+  @IsEnum(IdentificationType)
+  userIdentificationType: IdentificationType;
+  
+    
+  @IsOptional()
+  country: string;
+
+  @IsOptional() 
+  state: string;
+
+  @IsOptional() 
+  city: string;
+
   @IsOptional() 
   addressLine1: string;
- // @IsOptional() 
+   
+  
+  
+  // @IsOptional() 
   // image: string;
 
-  // @IsNotEmpty()
-  // country: string;
-
-  // @IsOptional() 
-  // state: string;
-
-  // @IsOptional() /
-  // city: string;
-
+  
   // @IsOptional()
   // latlong: string;
 
@@ -41,17 +50,9 @@ export class addDetailsDto {
   // @IsOptional() 
   // isVerified: boolean;
 
-  // @IsNotEmpty()
-  // @IsDateString()
-  // createdOnDate: Date;
-
-  // @IsOptional() 
-  // updatedOnDate: Date;
-
+  
   // @IsOptional()
   // isBiometricTnCAccepted: boolean;
 
-  // @IsNotEmpty()
-  // @IsEnum(IdentificationType)
-  // userIdentificationType: IdentificationType;
+  
 }

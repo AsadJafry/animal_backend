@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  ValidationPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,15 +22,17 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @UsePipes(ValidationPipe)
   createUser(@Body(MobileValidationPipe) createUserDto: CreateUserDto
   ) {
     return this.usersService.create(createUserDto);
   }
 
   @Patch(':id/details')
+  @UsePipes(ValidationPipe)
   addUserDetails(
     @Param('id', ParseIntPipe) id: number,
-    @Body(UserTypeValidationPipe,UserRoleValidPipe) addDetailsDto: addDetailsDto,
+    @Body() addDetailsDto: addDetailsDto,
   ) {
     return this.usersService.adduserDetails(id, addDetailsDto);
   }

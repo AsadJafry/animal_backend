@@ -5,33 +5,28 @@ export class User extends BaseEntity {
     userId: number;
 
     @Column()
-    password: string;
-  
-    @Column()
-    salt:string;
-    @Column()
     mobile: string;
+    
     @Column({ unique: true }) 
     email: string;
-  
-    @Column({ nullable: true })
-    userType: string;
-  
-   
-    @Column({ nullable: true })
-    userRole: string;
+
+    @Column()
+    password: string;
   
     @Column({ nullable: true })
     name: string;
   
+    @Column()
+    salt:string;
+    
     @Column({ nullable: true })
-    image: string;
-  
-   
-   
+    userType: string;
   
     @Column({ nullable: true })
-    addressLine1: string;
+    userRole: string;
+  
+    @Column({ nullable: true })
+    packageType: string;
   
     @Column({ nullable: true })
     country: string;
@@ -43,10 +38,18 @@ export class User extends BaseEntity {
     city: string;
   
     @Column({ nullable: true })
-    latlong: string;
+    addressLine1: string;
+    
+    @Column({ nullable: true })
+    image: string;
+  
+   
+   
+  
   
     @Column({ nullable: true })
-    packageType: string;
+    latlong: string;
+  
   
     @Column({ default: false })
     isVerified: boolean;
