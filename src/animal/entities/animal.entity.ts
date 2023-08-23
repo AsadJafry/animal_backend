@@ -6,15 +6,15 @@ import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Animal extends BaseEntity {
   @PrimaryGeneratedColumn()
-  Id: number;
+  animalId: number;
 
-  @Column({ type: 'enum', enum: AnimalCategory })
+  @Column({ type: 'enum', enum: AnimalCategory ,nullable:true})
   category: AnimalCategory;
 
-  @Column({ type: 'enum', enum: AnimalType })
+  @Column({ type: 'enum', enum: AnimalType ,nullable:true})
   animalType: AnimalType;
 
-  @Column({ type: 'enum', enum: AnimalBreed })
+  @Column({ type: 'enum', enum: AnimalBreed ,nullable:true})
   breed: AnimalBreed; 
 
   @Column({ nullable: true })
