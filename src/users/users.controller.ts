@@ -16,14 +16,15 @@ import { addDetailsDto } from './dto/addUserDetails.dto';
 import { MobileValidationPipe } from './pipes/mobile-validation.pipe';
 import { UserTypeValidationPipe } from './pipes/userTypeValidation.pipe';
 import { UserRoleValidPipe } from './pipes/userRoleValidation.pipe';
+import { signInDto } from './dto/signIn.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post(':id/signin')
-  userSignIn(@Param('id') userId,@Body('password') password:string){
-    return this.usersService.validatePass(userId,password)
+  @Post('signin')
+  userSignIn(@Body(ValidationPipe) signInDto:signInDto){
+    return this.usersService.signIn(signInDto)
   }
 
 

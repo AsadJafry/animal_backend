@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Entity, Repository } from 'typeorm';
@@ -6,12 +6,15 @@ import { User } from './entities/user.entity';
 import { addDetailsDto } from './dto/addUserDetails.dto';
 import * as bcrypt from 'bcrypt'
 import { IdentificationType } from 'src/enums/identification-type.enum';
+import { signInDto } from './dto/signIn.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private jwtService:JwtService
   ) {}
   private async hashPass(salt:string,password:string):Promise<string>{
     return await bcrypt.hash(password,salt) 
@@ -70,12 +73,23 @@ export class UsersService {
     await this.userRepository.save(user);
     return user;
   }
-  async validatePass(userID,password:string){
-    const user=await this.getById(userID);
-    if (await this.hashPass(user.salt,password)===user.password){
-        return "welcome"
+  async signIn(signInDto:signInDto){
+    const {email,password}=signInDto;
+    const user=await this.userRepository.findOneBy({email});
+    if (!user){
+      throw new NotFoundException ("user doest exist")
     }
-    else return 'incorrect password'
+    const loggedEmail= await this.validatePass(user,password)
+    const payload={loggedEmail};
+    const accessToken=await this.jwtService.sign(payload);
+    return {accessToken};
+  }
+  async validatePass(user:User,password:string){
+    
+    if (await this.hashPass(user.salt,password)===user.password){
+        return user.email
+    }
+    else throw new UnauthorizedException("incorrect password")
   }
   async findAll() {
     return await this.userRepository.find();
